@@ -94,17 +94,14 @@ func (ctlr *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-func (ctlr *UserController) searchUsername(w http.ResponseWriter, r *http.Request) {
+func (ctlr *UserController) validateUsername(w http.ResponseWriter, r *http.Request) {
 	username := chi.URLParam(r, "username")
-	fmt.Println(username)
 
 	userCheck := User{}
 	if err = ctlr.DB.Table("users").Where("user_name = ?", username).Find(&userCheck).Error; err == nil {
 		w.WriteHeader(400)
 		render.JSON(w, r, AuthenticationResponse{
 			StatusCode: 400,
-			Success:    false,
-			Message:    fmt.Sprintf("Username %s already exists! Please try another username.", username),
 		})
 		return
 	}
