@@ -39,7 +39,6 @@ type UserResponse struct {
 
 // AuthenticationResponse used to send a message to client about login/registration
 type AuthenticationResponse struct {
-	Success    bool         `json:"authenticated"`
 	StatusCode int          `json:"statusCode"`
 	Message    string       `json:"message"`
 	UserData   UserResponse `json:"userData"`
@@ -64,7 +63,6 @@ func (ctlr *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		render.JSON(w, r, AuthenticationResponse{
 			StatusCode: 400,
-			Success:    false,
 			Message:    fmt.Sprintf("Username %s already exists! Please try another username.", u.UserName),
 		})
 		return
@@ -75,7 +73,6 @@ func (ctlr *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		render.JSON(w, r, AuthenticationResponse{
 			StatusCode: 400,
-			Success:    false,
 			Message:    fmt.Sprintf("Email %s already exists! Please user another email.", u.Email),
 		})
 		return
@@ -92,6 +89,11 @@ func (ctlr *UserController) createUser(w http.ResponseWriter, r *http.Request) {
 	DB.Create(&u)
 
 	w.WriteHeader(200)
+	render.JSON(w, r, AuthenticationResponse{
+		StatusCode: 200,
+		Message:    "Registration successful!",
+	})
+	return
 }
 
 func (ctlr *UserController) validateUsername(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +112,7 @@ func (ctlr *UserController) validateUsername(w http.ResponseWriter, r *http.Requ
 	render.JSON(w, r, AuthenticationResponse{
 		StatusCode: 200,
 	})
+	return
 }
 
 func (ctlr *UserController) authenticateUser(w http.ResponseWriter, r *http.Request) {
@@ -131,7 +134,6 @@ func (ctlr *UserController) authenticateUser(w http.ResponseWriter, r *http.Requ
 
 	noMatchResponse := AuthenticationResponse{
 		StatusCode: 400,
-		Success:    false,
 		Message:    "Username or password do not match",
 	}
 
@@ -150,7 +152,6 @@ func (ctlr *UserController) authenticateUser(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(200)
 	render.JSON(w, r, AuthenticationResponse{
 		StatusCode: 200,
-		Success:    true,
 		Message:    "Login successful.",
 		UserData: UserResponse{
 			FirstName: userMatch.FirstName,
@@ -159,4 +160,5 @@ func (ctlr *UserController) authenticateUser(w http.ResponseWriter, r *http.Requ
 			Email:     userMatch.Email,
 		},
 	})
+	return
 }
