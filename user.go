@@ -115,6 +115,24 @@ func (ctlr *UserController) validateUsername(w http.ResponseWriter, r *http.Requ
 	return
 }
 
+func (ctlr *UserController) validateEmail(w http.ResponseWriter, r *http.Request) {
+	email := chi.URLParam(r, "email")
+
+	emailCheck := User{}
+	if err = ctlr.DB.Table("users").Where("email = ?", email).Find(&emailCheck).Error; err == nil {
+		w.WriteHeader(400)
+		render.JSON(w, r, AuthenticationResponse{
+			StatusCode: 400,
+		})
+		return
+	}
+
+	w.WriteHeader(200)
+	render.JSON(w, r, AuthenticationResponse{
+		StatusCode: 200,
+	})
+}
+
 func (ctlr *UserController) authenticateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content Type", "application/json")
 	b, err := ioutil.ReadAll(r.Body)

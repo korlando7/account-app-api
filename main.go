@@ -64,7 +64,8 @@ func main() {
 	r.Route("/user", func(r chi.Router) {
 		r.Route("/signup", func(r chi.Router) {
 			r.Post("/", userCtlr.createUser)
-			r.Get("/{username}", userCtlr.validateUsername)
+			r.Get("/email/{email}", userCtlr.validateEmail)
+			r.Get("/username/{username}", userCtlr.validateUsername)
 		})
 		r.Post("/login", userCtlr.authenticateUser)
 	})
